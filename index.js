@@ -208,23 +208,23 @@ console.log('Datas 🗓')
 // Outro exemplo de um objeto JavaScript é o Date.
 
 // Vamos criar a variável chamada hoje que irá receber a data de hoje.
-
+/*
 const hoje = new Date();
 console.log(hoje);
-const data = hoje.getDate;
-console.log(data);
+const dia = hoje.getDate;
+console.log(dia);
 
 const minhaDataNascimento = new Date(1997, 3, 24);
 
-const hoje = new Date()
+//const hoje = new Date()
 
-console.log(hoje) // 2020-09-05T10:56:49.693Z
+//console.log(hoje) // 2020-09-05T10:56:49.693Z
 
-const data = hoje.getDate()
+//const data = hoje.getDate()
 const mes = hoje.getMonth()
 const ano = hoje.getFullYear()
 
-console.log(dia, mes, ano) // 5 8 2020
+console.log(data, mes, ano) // 5 8 2020
 
 const dataFormatada = hoje.toLocaleDateString('pt-BR')
 console.log(dataFormatada) // 05/09/2020
@@ -234,7 +234,7 @@ const dataLonga = hoje.toLocaleDateString('pt-BR', options)
 console.log(dataLonga) // sábado, 5 de setembro de 2020
 
 
-
+*/
 
 
 
@@ -303,6 +303,105 @@ const pessoa = {
 
 console.log(pessoa);
 
+const pessoa2 = {
+  nome: 'Yasminn',
+  sobrenome: 'Vaz',
+  idade: 25,
+  altura: 1.62,
+  peso: 55,
+  andando: false,
+  caminhouQuantosMetros: 0,
+  fazerAniversario: () => pessoa2.idade++,
+  andar: (metrosCaminhados) => {
+    pessoa2.andando = true
+    pessoa2.caminhouQuantosMetros += metrosCaminhados
+  },
+  parar: () => pessoa2.andando = false,
+
+  apresentacao: () => {
+  
+    const anos = (pessoa2.idade === 1) ? 'ano' : 'anos';
+    const metros = (pessoa2.caminhouQuantosMetros === 1) ? 'metro' : 'metros';
+    
+    return `Olá, eu sou ${pessoa2.nome} ${pessoa2.sobrenome}, tenho ${pessoa2.idade} ${anos}, ${pessoa2.altura}, meu peso é ${pessoa2.peso} e, só hoje, eu já caminhei ${pessoa2.caminhouQuantosMetros} ${metros}!`
+  }
+}
+
+// Essa pessoa vai dar errado, porque tem this dentro de arrow function
+const pessoa3 = {
+  nome: 'Yasminn',
+  sobrenome: 'Vaz',
+  idade: 25,
+  altura: 1.62,
+  peso: 55,
+  andando: false,
+  caminhouQuantosMetros: 0,
+  fazerAniversario: () => this.idade++,
+  andar: (metrosCaminhados) => {
+    this.andando = true
+    this.caminhouQuantosMetros += metrosCaminhados
+  },
+  parar: () => this.andando = false,
+
+  apresentacao: () => {
+  
+    const anos = (this.idade === 1) ? 'ano' : 'anos';
+    const metros = (this.caminhouQuantosMetros === 1) ? 'metro' : 'metros';
+    
+    return `Olá, eu sou ${this.nome} ${this.sobrenome}, tenho ${this.idade} ${anos}, ${this.altura}, meu peso é ${this.peso} e, só hoje, eu já caminhei ${this.caminhouQuantosMetros} ${metros}!`
+  }
+}
+
+// Esse aqui tá certo, só não tá resumido
+const pessoa4 = {
+  nome: 'Yasminn',
+  sobrenome: 'Vaz',
+  idade: 25,
+  altura: 1.62,
+  peso: 55,
+  andando: false,
+  caminhouQuantosMetros: 0,
+  fazerAniversario: function(){this.idade++},
+  andar: function (metrosCaminhados) {
+    this.andando = true
+    this.caminhouQuantosMetros += metrosCaminhados
+  },
+  parar: function () {this.andando = false },
+
+  apresentacao: function () {
+  
+    const anos = (this.idade === 1) ? 'ano' : 'anos';
+    const metros = (this.caminhouQuantosMetros === 1) ? 'metro' : 'metros';
+    
+    return `Olá, eu sou ${this.nome} ${this.sobrenome}, tenho ${this.idade} ${anos}, ${this.altura}, meu peso é ${this.peso} e, só hoje, eu já caminhei ${this.caminhouQuantosMetros} ${metros}!`
+  }
+}
+
+// Assim funciona também, e é resumido
+const pessoa5 = {
+  nome: 'Yasminn',
+  sobrenome: 'Vaz',
+  idade: 25,
+  altura: 1.62,
+  peso: 55,
+  andando: false,
+  caminhouQuantosMetros: 0,
+  fazerAniversario(){this.idade++},
+  andar(metrosCaminhados) {
+    this.andando = true
+    this.caminhouQuantosMetros += metrosCaminhados
+  },
+  parar() {this.andando = false },
+
+  apresentacao() {
+  
+    const anos = (this.idade === 1) ? 'ano' : 'anos';
+    const metros = (this.caminhouQuantosMetros === 1) ? 'metro' : 'metros';
+    
+    return `Olá, eu sou ${this.nome} ${this.sobrenome}, tenho ${this.idade} ${anos}, ${this.altura}, meu peso é ${this.peso} e, só hoje, eu já caminhei ${this.caminhouQuantosMetros} ${metros}!`
+  }
+}
+
 
 
 
@@ -322,6 +421,36 @@ console.log('Classes 🆕')
 
 // Vamos criar a classe Pessoa
 
+class Pessoa {
+  constructor (name, surname, age, walking = true, distance = 0){
+    this.nome = name
+    this.sobrenome = surname
+    this.idade = age
+    this.andando = walking
+    this.caminhouQuantosMetros = distance
+  }
+
+  fazerAniversario(){
+    this.idade++
+  }
+
+  andar(metrosCaminhados) {
+    this.andando = true
+    this.caminhouQuantosMetros += metrosCaminhados
+  }
+
+  parar() {
+    this.andando = false 
+  }
+
+  apresentacao() {
+  
+    const anos = (this.idade === 1) ? 'ano' : 'anos';
+    const metros = (this.caminhouQuantosMetros === 1) ? 'metro' : 'metros';
+    
+    return `Olá, eu sou ${this.nome} ${this.sobrenome}, tenho ${this.idade} ${anos}, ${this.altura}, meu peso é ${this.peso} e, só hoje, eu já caminhei ${this.caminhouQuantosMetros} ${metros}!`
+  }
+}
 
 
 
@@ -340,7 +469,8 @@ const numbers = [9, 2, 5]
 
 // Acessando elementos pela posição do array
 
-
+console.log(numbers.length);
+console.log(lista[2]);
 
 
 
@@ -364,10 +494,14 @@ const numbers = [9, 2, 5]
 
 // Possuo 4 tias. Os dados delas estão armazenados no array de objetos dentro do arquivo db.js
 // Vamos importar esses dados para podermos usá-los durante nosso exercício de revisão.
-const db = require('./db')
+const db = require('./db');
+console.log(db);
 
 
-
+const { tias } = db;
+console.log(tias);
+console.table(tias);
+console.table(lista);
 
 
 
@@ -379,6 +513,10 @@ console.log('Métodos iteração ')
 // Mostre a tabela das tias pelo console.table()
 
 
+
+const tiasSP = tias.filter(item => item.local === "SP");
+
+console.table(tiasSP);
 
 
 
@@ -401,7 +539,17 @@ console.log('map()')
 // Crie um novo array chamado tiasMaisChegadas e adicione uma propriedade chamada cuidouDeMim que recebe um valor booleano. Caso a tia teve até 2 filhos, isso significa que ela cuidou de mim e seu valor é true. Caso ela teve mais que 2 filhos, o valor da propriedade cuidouDeMim é false.
 
 
+function cuidar(tia){
+  if (tia.filhos <= 2){
+    return tia.cuidouDeMim = true;
+  } else{
+    return tia.cuidouDeMim = false;
+  }
+}
 
+const tiasCuidou = tias.map(cuidar);
+console.table(tias);
+console.log(tiasCuidou);
 
 
 
@@ -414,14 +562,30 @@ console.log('sort()')
 // const numbers = [9, 2, 5]
 
 const comparar = (a, b) => {
-  if (a < b) { // primeiro vem b e depois vem a
+  if (a < b) { //  mantenho a como primeiro e b vem depois
     return -1
-  } else if (a > b) { // mantenho a como primeiro e b vem depois
+  } else if (a > b) { // primeiro vem b e depois vem a 
     return 1
   } else { // se a e b forem iguais, mantém a mesma ordem
     return 0
   }
 }
+
+
+// 9 e 2 -> retorna valor positivo -> 9 - 2 = 7 positivo
+// 2 e 5 -> retorna valor negativo -> 2 - 5 = - 3 negativo
+// 2 e 2 -> retorna valor zero -> 2 - 2 = 0
+// Então se eu retornar a - b, já dá certo
+
+const comparar2 = (a, b) => {
+  return a - b;
+}
+
+//numbers.sort(comparar2); // o sort modifica o array, não retorna outro!!
+
+numbers.sort((a, b) => a - b);
+console.log(numbers); // usei o comparar e alterei para comparar2 e usei de novo, depois mudei para ES6 e
+// usei de novo kkk
 
 // Refatore a função comparar e ordene numbers em ordem crescente
 
@@ -432,7 +596,14 @@ const comparar = (a, b) => {
 
 
 // Ordene as tias por ordem decrescente de idade (a mais velha primeiro)
+/*
+//forma inicial
+function ordenarTiasPorIdade(tia1, tia2){
+  return tia2.idade - tia1.idade;
+}*/
 
+tias.sort((tia1, tia2) => tia2.idade - tia1.idade);
+console.table(tias);
 
 
 
@@ -445,6 +616,16 @@ console.log('reduce()')
 // reduce
 
 // Faça a soma do array numbers
+/*function somarTodos(acumulador, item){
+  return acumulador + item;
+}*/
+
+//const somaDeTodos = numbers.reduce(somarTodos, 10); // segundo parametro acumulador: valor adicionado ao resultado
+
+const somaDeTodos = numbers.reduce((acumulador, item) => acumulador + item, 10); 
+console.log(somaDeTodos);
+
+
 
 
 
@@ -454,11 +635,15 @@ console.log('reduce()')
 
 // Some a quantidade de netos que vovó possui.
 
+/*function somarNetos(acumulador, item){
+  return acumulador + item.filhos;
+}
 
+const qtdeNetos = tias.reduce(somarNetos, 1);
+console.log(qtdeNetos);*/
 
-
-
-
+const qtdeNetos = tias.reduce((acumulador, item) => acumulador + item.filhos, 1);
+console.log(qtdeNetos);
 
 // ----------------------------------------------
 console.log('-----------------------------------------------------')
