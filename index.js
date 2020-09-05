@@ -11,8 +11,22 @@ function falar() {
   return 'Pipipi popopo'
 }
 
+const falar2 = function () {
+  return "oi";
+}
+
+const falar3 = () =>{
+  return "oi"
+}
+
+const falar4 = () => "oi";
+
 function dobro(num) {
   return num * 2
+}
+
+const dobro2 = function (num){
+  return num*2;
 }
 
 function calcularMedia(nota1, nota2, nota3) {
@@ -57,9 +71,16 @@ function ordenar(a, b) {
   }
 }
 
+///// EU
 
 // Crie uma função chamada calcular que receberá como parâmetro: dois números e uma função de callback
+function calcular (n1, n2, callback){
+  return callback(n1, n2);
+}
 
+
+// Calcular em arrow function ficaria assim:
+const calcular2 =  (n1, n2, callback) => callback(n1, n2);
 
 
 
@@ -67,6 +88,9 @@ function ordenar(a, b) {
 
 
 // Faça a soma de dois números usando a função calcular
+const resultadoSoma = calcular(10, 15, somar);
+console.log('A soma de 10 e 15 é ', resultadoSoma);
+
 
 
 
@@ -75,7 +99,8 @@ function ordenar(a, b) {
 
 
 // Faça a subtração de dois números usando a função calcular
-
+const resultadoSubtracao = calcular(100, 20, subtrair);
+console.log(`A subtração de 100 e 20 é ${resultadoSubtracao}`);
 
 
 
@@ -84,6 +109,8 @@ function ordenar(a, b) {
 
 // Faça a multiplicação de dois números usando a função calcular
 
+const resultadoMultiplicacao = calcular(100, 20, multiplicar);
+console.log(`A multiplicação de 100 e 20 é ${resultadoMultiplicacao}`);
 
 
 
@@ -93,12 +120,16 @@ function ordenar(a, b) {
 // Faça a divisão de dois números usando a função calcular
 
 
+const resultadoDivisao = calcular(100, 20, dividir);
+console.log(`A divisão de 100 e 20 é ${resultadoDivisao}`);
 
 
 
 
 // Faça a ordenação crescente de dois números usando a função calcular
 
+const resultadoOrdenacao = calcular(100, 20, ordenar);
+console.log(`A ordem crescente de 100 e 20 é ${resultadoOrdenacao}`);
 
 
 
@@ -119,11 +150,19 @@ const n3 = 1
 
 // Verifique se a estudante foi aprovada. Se a média das notas for maior ou igual a 7, a estudante passou!
 
+const media = calcularMedia(n1, n2, n3);
+console.log(`A média entre 9, 5 e 1 é ${media}`);
+/*
+const resultatoAprovacao0 = (if (media >= 7) {
+  return `Aprovado`;
+} else {
+  return `Reprovado`
+})*/
 
+const resultadoAprovacao = (media >= 7) ? "Aprovada" : "Reprovada";
+// condição ? true : false
 
-
-
-
+console.log(`A aluna foi ${resultadoAprovacao}`)
 
 console.log('-----------------------------------------------------')
 // ----------------------------------------------
@@ -143,6 +182,17 @@ const pokemon = {
 }
 
 // Fazer destructuring e acessar os valores de objeto e pokemon
+const { nome } = objeto;
+console.log(nome);
+
+const { tipo } = objeto;
+console.log(tipo);
+
+const { peso } = objeto;
+console.log(peso);
+
+const { name, type, height } = pokemon;
+console.log(`Meu pokemon é o ${name} e é do tipo ${type} e tem altura de ${height} cm.`);
 
 
 
@@ -158,6 +208,31 @@ console.log('Datas 🗓')
 // Outro exemplo de um objeto JavaScript é o Date.
 
 // Vamos criar a variável chamada hoje que irá receber a data de hoje.
+
+const hoje = new Date();
+console.log(hoje);
+const data = hoje.getDate;
+console.log(data);
+
+const minhaDataNascimento = new Date(1997, 3, 24);
+
+const hoje = new Date()
+
+console.log(hoje) // 2020-09-05T10:56:49.693Z
+
+const data = hoje.getDate()
+const mes = hoje.getMonth()
+const ano = hoje.getFullYear()
+
+console.log(dia, mes, ano) // 5 8 2020
+
+const dataFormatada = hoje.toLocaleDateString('pt-BR')
+console.log(dataFormatada) // 05/09/2020
+
+const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+const dataLonga = hoje.toLocaleDateString('pt-BR', options)
+console.log(dataLonga) // sábado, 5 de setembro de 2020
+
 
 
 
@@ -190,7 +265,7 @@ console.log('Datas 🗓')
 
 
 // Temos mais opções para formatar a data
-const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+//const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
 
 
 
@@ -209,55 +284,27 @@ const pessoa = {
   peso: 55,
   andando: false,
   caminhouQuantosMetros: 0,
-}
+  fazerAniversario: () => pessoa.idade++,
+  andar: (metrosCaminhados) => {
+    pessoa.andando = true
+    pessoa.caminhouQuantosMetros += metrosCaminhados
+  },
+  parar: () => pessoa.andando = false,
 
-pessoa.fazerAniversario = function () {
-  return pessoa.idade++
-}
-
-pessoa.andar = function (metrosCaminhados) {
-  pessoa.andando = true
-  pessoa.caminhouQuantosMetros += metrosCaminhados
-}
-
-pessoa.parar = function () {
-  pessoa.andando = false
-}
-
-pessoa.nomeCompleto = function () {
-  return `Olá, meu nome é ${pessoa.nome} ${pessoa.sobrenome}.`
-}
-
-pessoa.mostrarIdade = function () {
-  return `Olá, eu tenho ${pessoa.idade} anos.`
-}
-
-pessoa.mostrarPeso = function () {
-  return `Eu peso ${pessoa.peso}.`
-}
-
-pessoa.mostrarAltura = function () {
-  return `Minha altura é ${pessoa.altura}.`
-}
-
-pessoa.mostrarDistancia = function () {
-  return `${pessoa.nome} caminhou ${pessoa.caminhouQuantosMetros}m.`
-}
-
-pessoa.apresentacao = function () {
-  let anos = 'anos'
-  let metros = 'metros'
-
-  if (pessoa.idade === 1) {
-    anos = 'ano'
+  apresentacao: () => {
+  
+    const anos = (pessoa.idade === 1) ? 'ano' : 'anos';
+    const metros = (pessoa.caminhouQuantosMetros === 1) ? 'metro' : 'metros';
+    
+    return `Olá, eu sou ${pessoa.nome} ${pessoa.sobrenome}, tenho ${pessoa.idade} ${anos}, ${pessoa.altura}, meu peso é ${pessoa.peso} e, só hoje, eu já caminhei ${pessoa.caminhouQuantosMetros} ${metros}!`
   }
-
-  if (pessoa.caminhouQuantosMetros === 1) {
-    metros = 'metro'
-  }
-
-  return `Olá, eu sou ${pessoa.nome} ${pessoa.sobrenome}, tenho ${pessoa.idade} ${anos}, ${pessoa.altura}, meu peso é ${pessoa.peso} e, só hoje, eu já caminhei ${pessoa.caminhouQuantosMetros} ${metros}!`
 }
+
+
+console.log(pessoa);
+
+
+
 
 // Vamos utilizar o formato ES6 para refatorar a constante pessoa.
 
