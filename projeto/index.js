@@ -51,10 +51,39 @@ console.log('--------------------------------------');
 shoppingCart.sort((product1, product2) => product1.preco - product2.preco);
 console.table(shoppingCart);
 
+discountCouponsList = [
+    {
+        promoCode: 'loja10',
+        dueDate: new Date(2020, 12, 31),
+        value: 10
+    },
+    {
+        promoCode: 'loja15',
+        dueDate: new Date(2020, 8, 30),
+        value: 15
+    },
+    {
+        promoCode: 'loja30',
+        dueDate: new Date(2020, 01, 31),
+        value: 30
+    }
+];
+
+const validateCouponByPromoCode = promoCode => {
+    const coupon = discountCouponsList.find(coupon => coupon.promoCode === promoCode && coupon.dueDate > new Date());
+    return (typeof coupon === 'object') ? coupon : 'Cupom inválido ou expirado!';
+}
 
 
-/* 
 const hasDiscountCoupon = query('Você possui cupom de desconto? S ou N: ');
-const discountCoupon = query('De quanto é o seu cupom? ');
-*/
+let couponValue = 0;
 
+if (hasDiscountCoupon.toLowerCase() === 's') {
+    const promoCode = query('Digite o código do seu cupom: ');
+    const coupon = validateCouponByPromoCode(promoCode);
+    if(typeof coupon === 'string'){
+        console.log(coupon);
+    }else{
+        couponValue = coupon.value;
+    }
+}
