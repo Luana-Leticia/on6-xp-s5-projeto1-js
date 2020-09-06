@@ -4,12 +4,10 @@ console.log('--------------------------------------');
 
 const db = require('./database');
 const query = require('synchronous-user-input');
-const { compileFunction } = require('vm');
 
 const { produtos } = db;
 produtos.sort((product1, product2) => product1.preco - product2.preco);
-//console.table(produtos);
-
+console.table(produtos);
 
 const getProductById = id => {
     const product = produtos.find(product => product.id === id);
@@ -45,12 +43,7 @@ while (stillBuying.toLowerCase() === 's') {
     stillBuying = query('Deseja continuar comprando? S ou N: ');
 }
 
-console.log('--------------------------------------');
-console.log('     Seu Carrinho de Compras     ');
-console.log('--------------------------------------');
-
 shoppingCart.sort((product1, product2) => product1.preco - product2.preco);
-console.table(shoppingCart);
 
 discountCouponsList = [
     {
@@ -75,9 +68,7 @@ const validateCouponByPromoCode = promoCode => {
     return (typeof coupon === 'object') ? coupon : 'Cupom inválido ou expirado!';
 }
 
-
 const hasDiscountCoupon = query('Você possui cupom de desconto? S ou N: ');
-console.log("cupom aqui: ", hasDiscountCoupon);
 let couponValue = 0;
 
 if (hasDiscountCoupon.toLowerCase() === 's') {
@@ -116,17 +107,18 @@ class Pedido {
     calculateTotalPrice(){
         this.totalPrice = this.subtotalPrice - this.discountValue;
     }
-
 }
 
-console.log(couponValue);
 const pedido1 = new Pedido(shoppingCart, couponValue);
 pedido1.calculateTotalItems();
-
 pedido1.calculateSubtotalPrice();
 pedido1.calculateDiscount();
 pedido1.calculateTotalPrice();
-console.log(pedido1.totalItems, pedido1.couponDiscountValue, pedido1.subtotalPrice, pedido1.discountValue, pedido1.totalPrice);
 
-console.log('\n \n \n lista de produtos pedidos: ');
-console.table(pedido1.listOfProducts);
+console.log('--------------------------------------');
+console.log('     Seu Carrinho de Compras     ');
+console.log('--------------------------------------');
+console.table(shoppingCart);
+
+const { subtotalPrice, discountValue, totalPrice, orderDate } = pedido1;
+console.log(`Valor subtotal: R$ ${subtotalPrice} \nValor do desconto: R$ ${discountValue} \nValor total: R$ ${totalPrice} \nData da compra: ${orderDate}`);
