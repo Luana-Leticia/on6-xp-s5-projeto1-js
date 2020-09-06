@@ -21,10 +21,12 @@ const validateQuantity = quantity => (quantity > 0) ? quantity : 'Você digitou 
 const shoppingCart = [];
 
 let stillBuying = 's';
+let addedProduct;
+
 while (stillBuying.toLowerCase() === 's') {
-    let id = query('Digite o id do produto desejado: ');
+    let id = parseInt(query('Digite o id do produto desejado: '));
     let product = getProductById(id);
-    while(typeof product === "string"){
+    while(typeof product === 'string'){
         console.log(product);
         id = parseInt(query('Digite o id do produto desejado: '));
         product = getProductById(id);
@@ -37,8 +39,17 @@ while (stillBuying.toLowerCase() === 's') {
         quantity = validateQuantity(quantity);
     }
     
+    addedProduct = {...product, quantidade: quantity}
+    shoppingCart.push(addedProduct);
     stillBuying = query('Deseja continuar comprando? S ou N: ');
 }
+
+console.log('--------------------------------------');
+console.log('     Seu Carrinho de Compras     ');
+console.log('--------------------------------------');
+
+shoppingCart.sort((product1, product2) => product1.preco - product2.preco);
+console.table(shoppingCart);
 
 
 
