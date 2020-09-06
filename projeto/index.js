@@ -4,6 +4,7 @@ console.log('--------------------------------------');
 
 const db = require('./database');
 const query = require('synchronous-user-input');
+const { compileFunction } = require('vm');
 
 const { produtos } = db;
 produtos.sort((product1, product2) => product1.preco - product2.preco);
@@ -55,17 +56,17 @@ discountCouponsList = [
     {
         promoCode: 'loja10',
         dueDate: new Date(2020, 12, 31),
-        value: 10
+        value: 0.10
     },
     {
         promoCode: 'loja15',
         dueDate: new Date(2020, 8, 30),
-        value: 15
+        value: 0.15
     },
     {
         promoCode: 'loja30',
         dueDate: new Date(2020, 01, 31),
-        value: 30
+        value: 0.3
     }
 ];
 
@@ -76,6 +77,7 @@ const validateCouponByPromoCode = promoCode => {
 
 
 const hasDiscountCoupon = query('Você possui cupom de desconto? S ou N: ');
+console.log("cupom aqui: ", hasDiscountCoupon);
 let couponValue = 0;
 
 if (hasDiscountCoupon.toLowerCase() === 's') {
@@ -87,3 +89,44 @@ if (hasDiscountCoupon.toLowerCase() === 's') {
         couponValue = coupon.value;
     }
 }
+
+class Pedido {
+    constructor(productsList, couponValue, orderDate = new Date()){
+        this.listOfProducts = productsList;
+        this.couponDiscountValue = couponValue;
+        this.orderDate = orderDate;
+        this.totalItems = 0;
+        this.subtotalPrice = 0;
+        this.discountValue = 0;
+        this.totalPrice = 0;
+    }
+
+    calculateTotalItems(){
+        this.totalItems = this.listOfProducts.reduce((acumulator, product) => acumulator + product.quantidade, 0);
+    }
+
+    calculateSubtotalPrice(){
+        this.subtotalPrice = this.listOfProducts.reduce((acumulator, product) => acumulator + product.quantidade * product.preco, 0);
+    }
+
+    calculateDiscount(){
+        this.discountValue = this.subtotalPrice * this.couponDiscountValue;
+    }
+
+    calculateTotalPrice(){
+        this.totalPrice = this.subtotalPrice - this.discountValue;
+    }
+
+}
+
+console.log(couponValue);
+const pedido1 = new Pedido(shoppingCart, couponValue);
+pedido1.calculateTotalItems();
+
+pedido1.calculateSubtotalPrice();
+pedido1.calculateDiscount();
+pedido1.calculateTotalPrice();
+console.log(pedido1.totalItems, pedido1.couponDiscountValue, pedido1.subtotalPrice, pedido1.discountValue, pedido1.totalPrice);
+
+console.log('\n \n \n lista de produtos pedidos: ');
+console.table(pedido1.listOfProducts);
