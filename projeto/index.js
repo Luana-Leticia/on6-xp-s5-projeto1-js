@@ -97,6 +97,10 @@ const validateCouponByPromoCode = promoCode => {
 
 const validateChosenMenuOption = chosenMenuOption => ((chosenMenuOption >= 1 && chosenMenuOption <= 4) && Number.isInteger(chosenMenuOption)) ? chosenMenuOption : 'Você digitou o número de uma opção de menu inválido. Tente novamente!';
 
+const employeesPassword = 'senha123';
+
+const validateEmployeesPassword = passedPassword => (passedPassword === employeesPassword) ? true : 'Você digitou uma senha errada. Tente novamente!';
+
 let userNumber = 0;
 let wantCloseSystem = 'n';
 
@@ -198,6 +202,13 @@ while (wantCloseSystem === 'n') {
         requestsList.push(request);
 
     } else {
+        let employeesPassword = query('Digite a senha de acesso dos funcionários: ');
+        employeesPassword = validateEmployeesPassword(employeesPassword);
+        while (typeof employeesPassword === 'string') {
+            console.log(employeesPassword);
+            employeesPassword = query('Digite a senha de acesso dos funcionários: ');
+            employeesPassword = validateEmployeesPassword(employeesPassword);
+        }
         const menu = ['1 - Quantidade de pedidos do dia', '2 - Valor total vendido do dia', '3 - Lista de produtos vendidos', '4 - Tempo restante para fechar a loja'];
         let wantChoseAnotherMenuOption = 's';
 
