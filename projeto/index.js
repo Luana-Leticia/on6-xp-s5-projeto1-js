@@ -77,7 +77,7 @@ discountCouponsList = [
         validityCategories: categories
     },
     {
-        promoCode: 'bfinformatica',
+        promoCode: 'bfinfo',
         dueDate: new Date(2020, 11, 31),
         value: 0.3,
         validityCategories: ['informática']
@@ -95,6 +95,8 @@ const validateCouponByPromoCode = promoCode => {
     return (typeof coupon === 'object') ? coupon : emptyCoupon;
 }
 
+const validateChosenMenuOption = chosenMenuOption => ((chosenMenuOption >= 1 && chosenMenuOption <= 4) && Number.isInteger(chosenMenuOption)) ? chosenMenuOption : 'Você digitou o número de uma opção de menu inválido. Tente novamente!';
+
 let userNumber = 0;
 let wantCloseSystem = 'n';
 
@@ -110,6 +112,8 @@ while (wantCloseSystem === 'n') {
         userNumber = parseInt(query('Você é cliente ou funcionário? (1 - Cliente ou 2 - Funcionário) '));
         userNumber = validateUserNumber(userNumber);
     }
+
+    console.log('Seja bem-vindo!');
 
     if (userNumber === 1) {
         shoppingCart = [];
@@ -189,11 +193,55 @@ while (wantCloseSystem === 'n') {
         console.table(shoppingCart);
 
         const { subtotalPrice, discountValue, totalPrice, orderDate } = request;
-        console.log(`Valor subtotal: R$ ${subtotalPrice} \nValor do desconto: R$ ${discountValue} \nValor total: R$ ${totalPrice} \nData da compra: ${orderDate}`);
+        console.log(`Valor subtotal: R$ ${subtotalPrice.toFixed(2)} \nValor do desconto: R$ ${discountValue.toFixed(2)} \nValor total: R$ ${totalPrice.toFixed(2)} \nData da compra: ${orderDate}`);
 
         requestsList.push(request);
-    } else {
 
+    } else {
+        const menu = ['1 - Quantidade de pedidos do dia', '2 - Valor total vendido do dia', '3 - Lista de produtos vendidos', '4 - Tempo restante para fechar a loja'];
+        let wantChoseAnotherMenuOption = 's';
+
+        while (wantChoseAnotherMenuOption === 's') {
+            console.table(menu);
+            let chosenMenuOption = parseInt(query('Digite a opção do menu que você deseja consultar: '));
+            chosenMenuOption = validateChosenMenuOption(chosenMenuOption);
+            while (typeof chosenMenuOption === 'string') {
+                console.log(chosenMenuOption);
+                chosenMenuOption = parseInt(query('Digite a opção do menu que você deseja consultar: '));
+                chosenMenuOption = validateChosenMenuOption(chosenMenuOption);
+            }
+
+            switch (chosenMenuOption) {
+                case 1:
+                    let pedidosRealizados = (requestsList.length === 1) ? 'pedido realizado' : 'pedidos realizados';
+                    console.log(`Hoje tivemos ${requestsList.length} ${pedidosRealizados} até agora.`);
+                    break;
+                case 2:
+                    const totalSoldPrice = requestsList.reduce((acumulator, request) => acumulator + request.totalPrice, 0);
+                    console.log(`Hoje vendemos R$ ${totalSoldPrice.toFixed(2)} até agora.`);
+                    break;
+                case 3:
+                    const allSoldProducts = requestsList.reduce((acumulator, request) => acumulator.concat(request.listOfProducts), []);
+                    if(allSoldProducts.length === 0){
+                        console.table(allSoldProducts);
+                    } else {
+                        console.log('Não realizamos a primeira venda ainda. Veja mais tarde!');
+                    }                    
+                    break;
+                case 4:
+                    const todayDate = new Date();
+                    const remainingHours = 18 - todayDate.getHours();
+                    const remainingMinutes = 60 - todayDate.getMinutes();
+                    const horas = (remainingHours > 1) ? 'horas' : 'hora';
+                    const minutos = (remainingMinutes > 1) ? 'minutos' : 'minuto';
+                    console.log(`Resta ${remainingHours} ${horas} e ${remainingMinutes} ${minutos} para acabar o expediente! (Fim: 19h)`);
+                    break;
+                default:
+                    break;
+            }
+
+            wantChoseAnotherMenuOption = query('Deseja consultar outra opção do menu? ')
+        }     
     }
 
     wantCloseSystem = query('Deseja encerrar o sistema? S ou N: ');
