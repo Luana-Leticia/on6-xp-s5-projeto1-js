@@ -73,17 +73,26 @@ discountCouponsList = [
     {
         promoCode: 'loja10',
         dueDate: new Date(2020, 12, 31),
-        value: 0.10
+        value: 0.10,
+        category: categories
     },
     {
         promoCode: 'loja15',
         dueDate: new Date(2020, 8, 30),
-        value: 0.15
+        value: 0.15,
+        validityCategories: categories
     },
     {
         promoCode: 'loja30',
         dueDate: new Date(2020, 01, 31),
-        value: 0.3
+        value: 0.3,
+        validityCategories: categories
+    },
+    {
+        promoCode: 'bfinformatica',
+        dueDate: new Date(2020, 11, 31),
+        value: 0.3,
+        validityCategories: ['informática']
     }
 ];
 
@@ -93,22 +102,29 @@ const validateCouponByPromoCode = promoCode => {
 }
 
 const hasDiscountCoupon = query('Você possui cupom de desconto? S ou N: ');
-let couponValue = 0;
+let coupon;
 
 if (hasDiscountCoupon.toLowerCase() === 's') {
     const promoCode = query('Digite o código do seu cupom: ');
-    const coupon = validateCouponByPromoCode(promoCode);
+    coupon = validateCouponByPromoCode(promoCode);
     if(typeof coupon === 'string'){
         console.log(coupon);
+        coupon = {
+            promoCode: 'none',
+            dueDate: new Date(2000, 0, 1),
+            value: 0,
+            validityCategories: categories
+        }
     }else{
-        couponValue = coupon.value;
+        console.log('Esse cupom é válido nas seguintes categorias:');
+        console.table(coupon.validityCategories);
     }
 }
 
 class Pedido {
-    constructor(productsList, couponValue, orderDate = new Date()){
+    constructor(productsList, coupon, orderDate = new Date()){
         this.listOfProducts = productsList;
-        this.couponDiscountValue = couponValue;
+        this.coupon = coupon;
         this.orderDate = orderDate;
         this.totalItems = 0;
         this.subtotalPrice = 0;
@@ -125,7 +141,16 @@ class Pedido {
     }
 
     calculateDiscount(){
-        this.discountValue = this.subtotalPrice * this.couponDiscountValue;
+        if (this.coupon.validityCategories.length === categories.length){
+            this.discountValue = this.subtotalPrice * this.coupon.value;
+        } else {
+            for(let category of this.coupon.validityCategories){
+                const productsOfCouponCategory = this.listOfProducts.filter(product => product.categoria === category);
+                const validProductsSubtotalPrice = productsOfCouponCategory.reduce((acumulator, product) => acumulator + product.preco * product.quantidade, 0);
+                this.discountValue += validProductsSubtotalPrice * this.coupon.value;
+            }
+        }
+        
     }
 
     calculateTotalPrice(){
@@ -133,7 +158,7 @@ class Pedido {
     }
 }
 
-const pedido1 = new Pedido(shoppingCart, couponValue);
+const pedido1 = new Pedido(shoppingCart, coupon);
 pedido1.calculateTotalItems();
 pedido1.calculateSubtotalPrice();
 pedido1.calculateDiscount();
