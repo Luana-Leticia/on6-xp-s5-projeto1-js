@@ -6,41 +6,65 @@ const db = require('./database');
 const query = require('synchronous-user-input');
 
 const { produtos } = db;
-produtos.sort((product1, product2) => product1.preco - product2.preco);
-console.table(produtos);
 
-const getProductById = id => {
-    const product = produtos.find(product => product.id === id);
+produtos.sort((product1, product2) => product1.preco - product2.preco);
+
+const categories = produtos.reduce((acumulator, product) => (acumulator.includes(product.categoria)) ? acumulator : [...acumulator, product.categoria], []);
+
+const getProductById = (id, productsList) => {
+    const product = productsList.find(product => product.id === id);
     return (typeof product === 'object') ? product : 'Você digitou um id de um produto que não existe. Tente novamente!';
 }
 
 const validateQuantity = quantity => (quantity > 0) ? quantity : 'Você digitou uma quantidade igual a zero ou negativa. Tente novamente!';
 
+const validateCategoryNumber = categoryNumber => (categoryNumber >= 0 && categoryNumber < categories.length) ? categoryNumber : 'Você digitou um número de categoria inválido. Tente novamente!';
 
 const shoppingCart = [];
 
-let stillBuying = 's';
+let buyInAnotherCategory = 's';
+let categoryNumber = -1;
+
+let stillBuyingInCategory = 's';
 let addedProduct;
 
-while (stillBuying.toLowerCase() === 's') {
-    let id = parseInt(query('Digite o id do produto desejado: '));
-    let product = getProductById(id);
-    while(typeof product === 'string'){
-        console.log(product);
-        id = parseInt(query('Digite o id do produto desejado: '));
-        product = getProductById(id);
+while (buyInAnotherCategory.toLowerCase() === 's') {
+    console.table(categories);
+    categoryNumber = parseInt(query(`Escolha uma das categorias acima (número de 0 a ${categories.length - 1}): `));
+    categoryNumber = validateCategoryNumber(categoryNumber);
+    while(typeof categoryNumber === 'string'){
+        console.log(categoryNumber);
+        categoryNumber = parseInt(query(`Escolha uma das categorias acima (número de 0 a ${categories.length - 1}): `));
+        categoryNumber = validateCategoryNumber(categoryNumber);
     }
-    let quantity = parseInt(query('Digite a quantidade que gostaria de adquirir: '));
-    quantity = validateQuantity(quantity);
-    while(typeof quantity === 'string'){
-        console.log(quantity);
-        quantity = parseInt(query('Digite a quantidade que gostaria de adquirir: '));
+    const productsOfSpecificCategory = produtos.filter(product => product.categoria === categories[categoryNumber]);
+    console.table(productsOfSpecificCategory);
+
+    stillBuyingInCategory = 's';
+
+    while (stillBuyingInCategory.toLowerCase() === 's') {
+        let id = parseInt(query('Digite o id do produto desejado: '));
+        let product = getProductById(id, productsOfSpecificCategory);
+        while (typeof product === 'string') {
+            console.log(product);
+            id = parseInt(query('Digite o id do produto desejado: '));
+            product = getProductById(id, productsOfSpecificCategory);
+        }
+        let quantity = parseInt(query('Digite a quantidade que gostaria de adquirir: '));
         quantity = validateQuantity(quantity);
+        while (typeof quantity === 'string') {
+            console.log(quantity);
+            quantity = parseInt(query('Digite a quantidade que gostaria de adquirir: '));
+            quantity = validateQuantity(quantity);
+        }
+
+        addedProduct = { ...product, quantidade: quantity }
+        shoppingCart.push(addedProduct);
+
+        stillBuyingInCategory = query('Deseja continuar comprando nesta categoria? S ou N: ');
     }
-    
-    addedProduct = {...product, quantidade: quantity}
-    shoppingCart.push(addedProduct);
-    stillBuying = query('Deseja continuar comprando? S ou N: ');
+
+    buyInAnotherCategory = query('Você deseja comprar em outra categoria? S ou N: ');
 }
 
 shoppingCart.sort((product1, product2) => product1.preco - product2.preco);
