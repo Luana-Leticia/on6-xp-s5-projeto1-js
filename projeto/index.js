@@ -72,7 +72,7 @@ discountCouponsList = [
     },
     {
         promoCode: 'loja30',
-        dueDate: new Date(2020, 01, 31),
+        dueDate: new Date(2020, 0, 31),
         value: 0.3,
         validityCategories: categories
     },
@@ -117,6 +117,10 @@ while (wantCloseSystem === 'n') {
         userNumber = validateUserNumber(userNumber);
     }
 
+    const user = (userNumber === 1) ? 'clientes' : 'funcionários';
+    console.log('--------------------------------------');
+    console.log(`     Área de acesso dos ${user}     `);
+    console.log('--------------------------------------');
     console.log('Seja bem-vindo!');
 
     if (userNumber === 1) {
@@ -125,7 +129,7 @@ while (wantCloseSystem === 'n') {
         let buyInAnotherCategory = 's';
         let categoryNumber = -1;
 
-        let stillBuyingInCategory = 's';
+        let stillBuyingInThisCategory = 's';
         let addedProduct;
 
         while (buyInAnotherCategory.toLowerCase() === 's') {
@@ -140,9 +144,9 @@ while (wantCloseSystem === 'n') {
             const productsOfSpecificCategory = produtos.filter(product => product.categoria === categories[categoryNumber]);
             console.table(productsOfSpecificCategory);
 
-            stillBuyingInCategory = 's';
+            stillBuyingInThisCategory = 's';
 
-            while (stillBuyingInCategory.toLowerCase() === 's') {
+            while (stillBuyingInThisCategory.toLowerCase() === 's') {
                 let id = parseInt(query('Digite o id do produto desejado: '));
                 let product = getProductById(id, productsOfSpecificCategory);
                 while (typeof product === 'string') {
@@ -161,7 +165,7 @@ while (wantCloseSystem === 'n') {
                 addedProduct = { ...product, quantidade: quantity }
                 shoppingCart.push(addedProduct);
 
-                stillBuyingInCategory = query('Deseja continuar comprando nesta categoria? S ou N: ');
+                stillBuyingInThisCategory = query('Deseja continuar comprando nesta categoria? S ou N: ');
             }
 
             buyInAnotherCategory = query('Você deseja comprar em outra categoria? S ou N: ');
@@ -179,7 +183,8 @@ while (wantCloseSystem === 'n') {
                 console.log('Cupom inválido ou expirado!');
             } else {
                 console.log('Esse cupom é válido nas seguintes categorias:');
-                console.table(coupon.validityCategories);
+                const couponCategories = (coupon.validityCategories.length === categories.length) ? 'Todas as categorias' : coupon.validityCategories;
+                console.table(couponCategories);
             }
         } else {
             coupon = validateCouponByPromoCode('none');
@@ -197,7 +202,9 @@ while (wantCloseSystem === 'n') {
         console.table(shoppingCart);
 
         const { subtotalPrice, discountValue, totalPrice, orderDate } = request;
-        console.log(`Valor subtotal: R$ ${subtotalPrice.toFixed(2)} \nValor do desconto: R$ ${discountValue.toFixed(2)} \nValor total: R$ ${totalPrice.toFixed(2)} \nData da compra: ${orderDate}`);
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+        const orderDateString = orderDate.toLocaleDateString('pt-BR', options)
+        console.log(`Valor subtotal: R$ ${subtotalPrice.toFixed(2)} \nValor do desconto: R$ ${discountValue.toFixed(2)} \nValor total: R$ ${totalPrice.toFixed(2)} \nData da compra: ${orderDateString}`);
 
         requestsList.push(request);
 
@@ -210,10 +217,10 @@ while (wantCloseSystem === 'n') {
             employeesPassword = validateEmployeesPassword(employeesPassword);
         }
         const menu = ['1 - Quantidade de pedidos do dia', '2 - Valor total vendido do dia', '3 - Lista de produtos vendidos', '4 - Tempo restante para fechar a loja'];
+        console.table(menu);
         let wantChoseAnotherMenuOption = 's';
 
         while (wantChoseAnotherMenuOption === 's') {
-            console.table(menu);
             let chosenMenuOption = parseInt(query('Digite a opção do menu que você deseja consultar: '));
             chosenMenuOption = validateChosenMenuOption(chosenMenuOption);
             while (typeof chosenMenuOption === 'string') {
@@ -224,7 +231,7 @@ while (wantCloseSystem === 'n') {
 
             switch (chosenMenuOption) {
                 case 1:
-                    let pedidosRealizados = (requestsList.length === 1) ? 'pedido realizado' : 'pedidos realizados';
+                    let pedidosRealizados = (requestsList.length > 1) ? 'pedidos realizados' : 'pedido realizado';
                     console.log(`Hoje tivemos ${requestsList.length} ${pedidosRealizados} até agora.`);
                     break;
                 case 2:
@@ -233,7 +240,7 @@ while (wantCloseSystem === 'n') {
                     break;
                 case 3:
                     const allSoldProducts = requestsList.reduce((acumulator, request) => acumulator.concat(request.listOfProducts), []);
-                    if(allSoldProducts.length === 0){
+                    if(allSoldProducts.length !== 0){
                         console.table(allSoldProducts);
                     } else {
                         console.log('Não realizamos a primeira venda ainda. Veja mais tarde!');
