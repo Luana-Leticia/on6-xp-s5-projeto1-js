@@ -8,6 +8,34 @@ const query = require('synchronous-user-input');
 const { produtos } = db;
 produtos.sort((product1, product2) => product1.preco - product2.preco);
 const categories = produtos.reduce((acumulator, product) => (acumulator.includes(product.categoria)) ? acumulator : [...acumulator, product.categoria], []);
+const employeesPassword = 'senha123';
+
+const discountCouponsList = [
+    {
+      promoCode: 'loja10',
+      dueDate: new Date(2020, 12, 31),
+      value: 0.10,
+      validityCategories: categories
+    },
+    {
+      promoCode: 'loja15',
+      dueDate: new Date(2020, 8, 30),
+      value: 0.15,
+      validityCategories: categories
+    },
+    {
+      promoCode: 'loja30',
+      dueDate: new Date(2020, 0, 31),
+      value: 0.3,
+      validityCategories: categories
+    },
+    {
+      promoCode: 'bfinfo',
+      dueDate: new Date(2020, 11, 31),
+      value: 0.3,
+      validityCategories: ['informática']
+    }
+  ];
 
 const getProductById = (id, productsList) => {
     const product = productsList.find(product => product.id === id);
@@ -19,6 +47,21 @@ const validateQuantity = quantity => (quantity > 0) ? quantity : 'Você digitou 
 const validateCategoryNumber = categoryNumber => (categoryNumber >= 0 && categoryNumber < categories.length) ? categoryNumber : 'Você digitou um número de categoria inválido. Tente novamente!';
 
 const validateUserNumber = userNumber => (userNumber === 1 || userNumber === 2) ? userNumber : 'Você digitou um número de uma opção inválida de usuário. Tente novamente!';
+
+const validateCouponByPromoCode = promoCode => {
+    const coupon = discountCouponsList.find(coupon => coupon.promoCode === promoCode && coupon.dueDate > new Date());
+    const emptyCoupon = {
+        promoCode: 'none',
+        dueDate: new Date(2000, 0, 1),
+        value: 0,
+        validityCategories: categories
+    }
+    return (typeof coupon === 'object') ? coupon : emptyCoupon;
+}
+
+const validateChosenMenuOption = chosenMenuOption => ((chosenMenuOption >= 1 && chosenMenuOption <= 4) && Number.isInteger(chosenMenuOption)) ? chosenMenuOption : 'Você digitou o número de uma opção de menu inválido. Tente novamente!';
+
+const validateEmployeesPassword = passedPassword => (passedPassword === employeesPassword) ? true : 'Você digitou uma senha errada. Tente novamente!';
 
 class Pedido {
     constructor(productsList, coupon, orderDate = new Date()){
@@ -57,59 +100,12 @@ class Pedido {
     }
 }
 
-discountCouponsList = [
-    {
-        promoCode: 'loja10',
-        dueDate: new Date(2020, 12, 31),
-        value: 0.10,
-        validityCategories: categories
-    },
-    {
-        promoCode: 'loja15',
-        dueDate: new Date(2020, 8, 30),
-        value: 0.15,
-        validityCategories: categories
-    },
-    {
-        promoCode: 'loja30',
-        dueDate: new Date(2020, 0, 31),
-        value: 0.3,
-        validityCategories: categories
-    },
-    {
-        promoCode: 'bfinfo',
-        dueDate: new Date(2020, 11, 31),
-        value: 0.3,
-        validityCategories: ['informática']
-    }
-];
 
-const validateCouponByPromoCode = promoCode => {
-    const coupon = discountCouponsList.find(coupon => coupon.promoCode === promoCode && coupon.dueDate > new Date());
-    const emptyCoupon = {
-        promoCode: 'none',
-        dueDate: new Date(2000, 0, 1),
-        value: 0,
-        validityCategories: categories
-    }
-    return (typeof coupon === 'object') ? coupon : emptyCoupon;
-}
-
-const validateChosenMenuOption = chosenMenuOption => ((chosenMenuOption >= 1 && chosenMenuOption <= 4) && Number.isInteger(chosenMenuOption)) ? chosenMenuOption : 'Você digitou o número de uma opção de menu inválido. Tente novamente!';
-
-const employeesPassword = 'senha123';
-
-const validateEmployeesPassword = passedPassword => (passedPassword === employeesPassword) ? true : 'Você digitou uma senha errada. Tente novamente!';
-
-let userNumber = 0;
 let wantCloseSystem = 'n';
-
-let requestsList = [];
-let shoppingCart;
-let request;
+const requestsList = [];
 
 while (wantCloseSystem === 'n') {
-    userNumber = parseInt(query('Você é cliente ou funcionário? (1 - Cliente ou 2 - Funcionário) '));
+    let userNumber = parseInt(query('Você é cliente ou funcionário? (1 - Cliente ou 2 - Funcionário) '));
     userNumber = validateUserNumber(userNumber);
     while (typeof userNumber === 'string') {
         console.log(userNumber);
@@ -124,17 +120,14 @@ while (wantCloseSystem === 'n') {
     console.log('Seja bem-vindo!');
 
     if (userNumber === 1) {
-        shoppingCart = [];
+        const shoppingCart = [];
 
         let buyInAnotherCategory = 's';
-        let categoryNumber = -1;
-
         let stillBuyingInThisCategory = 's';
-        let addedProduct;
 
         while (buyInAnotherCategory.toLowerCase() === 's') {
             console.table(categories);
-            categoryNumber = parseInt(query(`Escolha uma das categorias acima (número de 0 a ${categories.length - 1}): `));
+            let categoryNumber = parseInt(query(`Escolha uma das categorias acima (número de 0 a ${categories.length - 1}): `));
             categoryNumber = validateCategoryNumber(categoryNumber);
             while (typeof categoryNumber === 'string') {
                 console.log(categoryNumber);
@@ -162,7 +155,7 @@ while (wantCloseSystem === 'n') {
                     quantity = validateQuantity(quantity);
                 }
 
-                addedProduct = { ...product, quantidade: quantity }
+                const addedProduct = { ...product, quantidade: quantity }
                 shoppingCart.push(addedProduct);
 
                 stillBuyingInThisCategory = query('Deseja continuar comprando nesta categoria? S ou N: ');
@@ -190,7 +183,7 @@ while (wantCloseSystem === 'n') {
             coupon = validateCouponByPromoCode('none');
         }
 
-        request = new Pedido(shoppingCart, coupon);
+        const request = new Pedido(shoppingCart, coupon);
         request.calculateTotalItems();
         request.calculateSubtotalPrice();
         request.calculateDiscount();
