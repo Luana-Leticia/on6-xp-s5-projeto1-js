@@ -15,19 +15,19 @@ const discountCouponsList = [
       promoCode: 'loja10',
       dueDate: new Date(2020, 12, 31),
       value: 0.10,
-      validityCategories: categories
+      validityCategories: ['alimento', 'informática', 'casa', 'higiene', 'bebida']
     },
     {
       promoCode: 'loja15',
       dueDate: new Date(2020, 8, 30),
       value: 0.15,
-      validityCategories: categories
+      validityCategories: ['alimento', 'informática', 'casa', 'higiene', 'bebida']
     },
     {
       promoCode: 'loja30',
       dueDate: new Date(2020, 0, 31),
       value: 0.3,
-      validityCategories: categories
+      validityCategories: ['alimento', 'informática', 'casa', 'higiene', 'bebida']
     },
     {
       promoCode: 'bfinfo',
@@ -42,12 +42,6 @@ const getProductById = (id, productsList) => {
     return (typeof product === 'object') ? product : 'Você digitou um id de um produto que não existe. Tente novamente!';
 }
 
-const validateQuantity = quantity => (quantity > 0) ? quantity : 'Você digitou uma quantidade igual a zero ou negativa. Tente novamente!';
-
-const validateCategoryNumber = categoryNumber => (categoryNumber >= 0 && categoryNumber < categories.length) ? categoryNumber : 'Você digitou um número de categoria inválido. Tente novamente!';
-
-const validateUserNumber = userNumber => (userNumber === 1 || userNumber === 2) ? userNumber : 'Você digitou um número de uma opção inválida de usuário. Tente novamente!';
-
 const validateCouponByPromoCode = promoCode => {
     const coupon = discountCouponsList.find(coupon => coupon.promoCode === promoCode && coupon.dueDate > new Date());
     const emptyCoupon = {
@@ -58,10 +52,6 @@ const validateCouponByPromoCode = promoCode => {
     }
     return (typeof coupon === 'object') ? coupon : emptyCoupon;
 }
-
-const validateChosenMenuOption = chosenMenuOption => ((chosenMenuOption >= 1 && chosenMenuOption <= 4) && Number.isInteger(chosenMenuOption)) ? chosenMenuOption : 'Você digitou o número de uma opção de menu inválido. Tente novamente!';
-
-const validateEmployeesPassword = passedPassword => (passedPassword === employeesPassword) ? true : 'Você digitou uma senha errada. Tente novamente!';
 
 class Pedido {
     constructor(productsList, coupon, orderDate = new Date()){
@@ -100,17 +90,14 @@ class Pedido {
     }
 }
 
-
 let wantCloseSystem = 'n';
 const requestsList = [];
 
 while (wantCloseSystem === 'n') {
     let userNumber = parseInt(query('Você é cliente ou funcionário? (1 - Cliente ou 2 - Funcionário) '));
-    userNumber = validateUserNumber(userNumber);
-    while (typeof userNumber === 'string') {
-        console.log(userNumber);
+    while (userNumber !== 1 && userNumber !== 2) {
+        console.log('Você digitou um número de uma opção inválida de usuário. Tente novamente!');
         userNumber = parseInt(query('Você é cliente ou funcionário? (1 - Cliente ou 2 - Funcionário) '));
-        userNumber = validateUserNumber(userNumber);
     }
 
     const user = (userNumber === 1) ? 'clientes' : 'funcionários';
@@ -122,17 +109,15 @@ while (wantCloseSystem === 'n') {
     if (userNumber === 1) {
         const shoppingCart = [];
 
+        console.table(categories);
         let buyInAnotherCategory = 's';
         let stillBuyingInThisCategory = 's';
 
-        while (buyInAnotherCategory.toLowerCase() === 's') {
-            console.table(categories);
+        while (buyInAnotherCategory.toLowerCase() === 's') {            
             let categoryNumber = parseInt(query(`Escolha uma das categorias acima (número de 0 a ${categories.length - 1}): `));
-            categoryNumber = validateCategoryNumber(categoryNumber);
-            while (typeof categoryNumber === 'string') {
-                console.log(categoryNumber);
+            while (categoryNumber < 0 || categoryNumber >= categories.length) {
+                console.log('Você digitou um número de categoria inválido. Tente novamente!');
                 categoryNumber = parseInt(query(`Escolha uma das categorias acima (número de 0 a ${categories.length - 1}): `));
-                categoryNumber = validateCategoryNumber(categoryNumber);
             }
             const productsOfSpecificCategory = produtos.filter(product => product.categoria === categories[categoryNumber]);
             console.table(productsOfSpecificCategory);
@@ -148,11 +133,9 @@ while (wantCloseSystem === 'n') {
                     product = getProductById(id, productsOfSpecificCategory);
                 }
                 let quantity = parseInt(query('Digite a quantidade que gostaria de adquirir: '));
-                quantity = validateQuantity(quantity);
-                while (typeof quantity === 'string') {
-                    console.log(quantity);
+                while (quantity <= 0) {
+                    console.log('Você digitou uma quantidade igual a zero ou negativa. Tente novamente!');
                     quantity = parseInt(query('Digite a quantidade que gostaria de adquirir: '));
-                    quantity = validateQuantity(quantity);
                 }
 
                 const addedProduct = { ...product, quantidade: quantity }
@@ -172,7 +155,7 @@ while (wantCloseSystem === 'n') {
         if (hasDiscountCoupon.toLowerCase() === 's') {
             const promoCode = query('Digite o código do seu cupom: ');
             coupon = validateCouponByPromoCode(promoCode);
-            if (typeof coupon.promoCode === 'none') {
+            if (coupon.promoCode === 'none') {
                 console.log('Cupom inválido ou expirado!');
             } else {
                 console.log('Esse cupom é válido nas seguintes categorias:');
@@ -202,12 +185,10 @@ while (wantCloseSystem === 'n') {
         requestsList.push(request);
 
     } else {
-        let employeesPassword = query('Digite a senha de acesso dos funcionários: ');
-        employeesPassword = validateEmployeesPassword(employeesPassword);
-        while (typeof employeesPassword === 'string') {
-            console.log(employeesPassword);
-            employeesPassword = query('Digite a senha de acesso dos funcionários: ');
-            employeesPassword = validateEmployeesPassword(employeesPassword);
+        let passedPassword = query('Digite a senha de acesso dos funcionários: ');
+        while (passedPassword !== employeesPassword) {
+            console.log('Você digitou uma senha errada. Tente novamente!');
+            passedPassword = query('Digite a senha de acesso dos funcionários: ');
         }
         const menu = ['1 - Quantidade de pedidos do dia', '2 - Valor total vendido do dia', '3 - Lista de produtos vendidos', '4 - Tempo restante para fechar a loja'];
         console.table(menu);
@@ -215,11 +196,9 @@ while (wantCloseSystem === 'n') {
 
         while (wantChoseAnotherMenuOption === 's') {
             let chosenMenuOption = parseInt(query('Digite a opção do menu que você deseja consultar: '));
-            chosenMenuOption = validateChosenMenuOption(chosenMenuOption);
-            while (typeof chosenMenuOption === 'string') {
-                console.log(chosenMenuOption);
+            while (chosenMenuOption < 1 || chosenMenuOption > menu.length) {
+                console.log('Você digitou o número de uma opção de menu inválido. Tente novamente!');
                 chosenMenuOption = parseInt(query('Digite a opção do menu que você deseja consultar: '));
-                chosenMenuOption = validateChosenMenuOption(chosenMenuOption);
             }
 
             switch (chosenMenuOption) {
